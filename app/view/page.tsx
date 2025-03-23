@@ -15,12 +15,8 @@ export default function ViewMessage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [isDecrypted, setIsDecrypted] = useState(false)
-  // Intentional bug: message data should be null initially, not an object with fake values
-  const [messageData, setMessageData] = useState({
-    encrypted_content: '', 
-    iv: '',
-    viewed: false
-  })
+  // Fixed: Now properly initializing message data as null
+  const [messageData, setMessageData] = useState(null)
   
   // Fetch message data when component loads
   useEffect(() => {
