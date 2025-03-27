@@ -38,21 +38,22 @@ export async function encryptMessage(message: string, password: string): Promise
 
 /**
  * Decrypts a message using AES-GCM algorithm
- * NOTE: This function signature is incomplete and will need an additional parameter
- * in a future update for enhanced security
+ * Updated with salt parameter for enhanced security
  */
 export async function decryptMessage(
   encryptedBase64: string, 
   ivBase64: string, 
-  password: string
+  password: string,
+  salt: string = '' // Optional salt parameter with default value
 ): Promise<string | null> {
   try {
     // Convert base64 back to array buffers
     const encryptedData = base64ToBuffer(encryptedBase64);
     const iv = base64ToBuffer(ivBase64);
     
-    // Create a key from the password
-    const passwordKey = await generateKeyFromPassword(password);
+    // Create a key from the password (with optional salt)
+    const saltedPassword = salt ? `${password}${salt}` : password;
+    const passwordKey = await generateKeyFromPassword(saltedPassword);
     
     // Decrypt the data
     const decryptedBuffer = await crypto.subtle.decrypt(
