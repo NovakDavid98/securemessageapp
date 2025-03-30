@@ -1,27 +1,30 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Shield, Lock, Copy, Eye, EyeOff, KeyRound, ArrowLeft, AlertTriangle } from "lucide-react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { MatrixBackground } from "@/components/matrix-background"
-import { NavHeader } from "@/components/nav-header"
-import { encryptMessage, decryptMessage } from "@/lib/encryption"
-import { useAuth } from "@/contexts/auth-context"
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      <h1 className="text-4xl font-bold mb-4">Secure Message Exchange</h1>
-      <p className="text-xl mb-8">
-        A platform for exchanging encrypted messages securely.
+    <div className="flex flex-col items-center justify-center min-h-[70vh]">
+      <h1 className="text-4xl font-bold mb-4 text-green-500">Secure Message Exchange</h1>
+      <p className="text-xl mb-8 text-gray-300">
+        Exchange encrypted messages securely.
       </p>
-      <div className="p-4 border border-gray-300 rounded-md">
-        <p>Coming soon! Check back for updates.</p>
-      </div>
+      
+      <Card className="w-full max-w-md bg-gray-800 border-gray-700 text-white">
+        <CardHeader>
+          <CardTitle className="text-green-400">Secure Messaging</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="mb-4">
+            Create encrypted messages that self-destruct after viewing.
+            Perfect for sharing sensitive information.
+          </p>
+          <Button variant="primary" className="w-full">
+            Coming Soon
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   )
 }

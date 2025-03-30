@@ -1,5 +1,7 @@
 import './globals.css'
 import type { Metadata } from 'next'
+import { NavHeader } from '@/components/nav-header'
+import { MatrixBackground } from '@/components/matrix-background'
 
 export const metadata: Metadata = {
   title: 'Secure Message Exchange',
@@ -13,8 +15,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <main>{children}</main>
+      <body className="bg-gray-900 text-white min-h-screen">
+        <MatrixBackground />
+        <div className="relative z-10">
+          <NavHeader />
+          <main className="container mx-auto px-4 py-8">
+            {children}
+          </main>
+        </div>
       </body>
     </html>
   )

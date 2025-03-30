@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import React, { useEffect, useRef } from 'react'
 
 export function MatrixBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -9,85 +9,77 @@ export function MatrixBackground() {
     const canvas = canvasRef.current
     if (!canvas) return
 
-    const ctx = canvas.getContext("2d")
+    const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    // Set canvas to full screen
-    const resizeCanvas = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
-    }
+    // Set canvas dimensions
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
 
-    resizeCanvas()
-    window.addEventListener("resize", resizeCanvas)
-
-    // Matrix characters - taken from the original movie
-    const characters =
-      "アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    const charArray = characters.split("")
-
-    // Set up columns
+    // Matrix characters
+    const chars = '01'
+    
+    // Column setup
     const fontSize = 14
     const columns = Math.floor(canvas.width / fontSize)
-
-    // Array to track the y position of each column
+    
+    // Initialize drops at random positions
     const drops: number[] = []
     for (let i = 0; i < columns; i++) {
-      drops[i] = Math.random() * -100 // Start above the canvas
+      drops[i] = Math.random() * canvas.height
     }
 
-    // Drawing the characters
+    // Draw the matrix effect
     const draw = () => {
-      // Black with opacity to create fade effect
-      ctx.fillStyle = "rgba(0, 0, 0, 0.05)"
+      // Add semi-transparent black to create fade effect
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-      // Set color and font
-      ctx.fillStyle = "#0f0" // Bright green
+      // Set text color and font
+      ctx.fillStyle = '#0f0'
       ctx.font = `${fontSize}px monospace`
 
       // Draw characters
       for (let i = 0; i < drops.length; i++) {
-        // Random character
-        const char = charArray[Math.floor(Math.random() * charArray.length)]
-
-        // Draw the character
-        const x = i * fontSize
-        const y = drops[i] * fontSize
-
-        // Add glow effect to some characters
-        if (Math.random() > 0.975) {
-          ctx.fillStyle = "#7cffcb" // Brighter emerald for glow
-          ctx.shadowBlur = 10
-          ctx.shadowColor = "#0f0"
-        } else {
-          // Vary the green color slightly
-          const green = 128 + Math.floor(Math.random() * 128)
-          ctx.fillStyle = `rgba(0, ${green}, 0, 0.8)`
-          ctx.shadowBlur = 0
-        }
-
-        ctx.fillText(char, x, y)
-
-        // Reset when off screen and randomize speed
-        if (y > canvas.height && Math.random() > 0.975) {
+        // Get random character
+        const char = chars[Math.floor(Math.random() * chars.length)]
+        
+        // Draw character
+        ctx.fillText(char, i * fontSize, drops[i] * fontSize)
+        
+        // Reset drop when it reaches bottom or randomly
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
           drops[i] = 0
         }
-
-        // Increment y coordinate
+        
+        // Move drop down
         drops[i]++
       }
     }
 
     // Animation loop
-    const interval = setInterval(draw, 33) // ~30 fps
+    const interval = setInterval(draw, 50)
 
+    // Handle resize
+    const handleResize = () => {
+      canvas.width = window.innerWidth
+      canvas.height = window.innerHeight
+    }
+    
+    window.addEventListener('resize', handleResize)
+
+    // Cleanup
     return () => {
       clearInterval(interval)
-      window.removeEventListener("resize", resizeCanvas)
+      window.removeEventListener('resize', handleResize)
     }
   }, [])
 
-  return <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full -z-10" style={{ opacity: 0.5 }} />
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed top-0 left-0 w-full h-full -z-10"
+    />
+  )
 }
 
