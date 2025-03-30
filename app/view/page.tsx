@@ -70,13 +70,13 @@ export default function ViewMessage() {
       setIsLoading(true)
       setError('')
       
-      // Bug fix: decryptMessage function has wrong parameter call
-      // Should include salt parameter, but our version doesn't use it yet
-      // This will be fixed in a future commit
+      // Updated to properly call the decryptMessage function with all parameters
+      // Now using the optional salt parameter added in the recent update
       const decrypted = await decryptMessage(
         messageData.encrypted_content,
         messageData.iv,
-        password
+        password,
+        messageData.salt || '' // Use empty string as default if salt is not available
       )
       
       if (decrypted) {
