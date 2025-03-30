@@ -40,44 +40,32 @@ const base64ToArrayBuffer = (base64: string) => {
   return bytes.buffer
 }
 
-// Generate a cryptographic key from a password
-const getKeyFromPassword = async (password: string, salt: Uint8Array) => {
+// Generate a key from password
+const getKeyFromPassword = async (password: string) => {
   // Convert password to buffer
   const passwordBuffer = str2ab(password)
-
+  
   // Import the password as a key
-  const passwordKey = await window.crypto.subtle.importKey("raw", passwordBuffer, { name: "PBKDF2" }, false, [
-    "deriveKey",
-  ])
-
-  // Derive a key using PBKDF2 (Password-Based Key Derivation Function 2)
-  // This makes brute force attacks much more difficult
-  return window.crypto.subtle.deriveKey(
-    {
-      name: "PBKDF2",
-      salt,
-      iterations: 100000, // High iteration count for security
-      hash: "SHA-256",
-    },
-    passwordKey,
-    { name: "AES-GCM", length: 256 },
+  const key = await window.crypto.subtle.importKey(
+    "raw",
+    passwordBuffer,
+    { name: "AES-GCM" },
     false,
-    ["encrypt", "decrypt"],
+    ["encrypt", "decrypt"]
   )
+  
+  return key
 }
 
 // Encrypt a message with a password
 export const encryptMessage = async (message: string, password: string) => {
   try {
-    // Generate a random salt for key derivation
-    const salt = window.crypto.getRandomValues(new Uint8Array(16))
-
     // Generate a random initialization vector
     const iv = window.crypto.getRandomValues(new Uint8Array(12))
-
-    // Derive encryption key from password and salt
-    const key = await getKeyFromPassword(password, salt)
-
+    
+    // Get key from password
+    const key = await getKeyFromPassword(password)
+    
     // Encrypt the message
     const encodedMessage = new TextEncoder().encode(message)
     const encryptedContent = await window.crypto.subtle.encrypt(
@@ -86,14 +74,13 @@ export const encryptMessage = async (message: string, password: string) => {
         iv,
       },
       key,
-      encodedMessage,
+      encodedMessage
     )
-
-    // Return the encrypted data, IV, and salt as base64 strings
+    
+    // Return the encrypted data and IV as base64 strings
     return {
       encryptedContent: arrayBufferToBase64(encryptedContent),
       iv: arrayBufferToBase64(iv),
-      salt: arrayBufferToBase64(salt),
     }
   } catch (error) {
     console.error("Encryption error:", error)
@@ -102,16 +89,15 @@ export const encryptMessage = async (message: string, password: string) => {
 }
 
 // Decrypt a message with a password
-export const decryptMessage = async (encryptedContent: string, iv: string, salt: string, password: string) => {
+export const decryptMessage = async (encryptedContent: string, iv: string, password: string) => {
   try {
     // Convert base64 strings back to ArrayBuffers
     const encryptedData = base64ToArrayBuffer(encryptedContent)
     const ivBuffer = base64ToArrayBuffer(iv)
-    const saltBuffer = base64ToArrayBuffer(salt)
-
-    // Derive the same key from password and salt
-    const key = await getKeyFromPassword(password, new Uint8Array(saltBuffer))
-
+    
+    // Get key from password
+    const key = await getKeyFromPassword(password)
+    
     // Decrypt the message
     const decryptedContent = await window.crypto.subtle.decrypt(
       {
@@ -119,9 +105,9 @@ export const decryptMessage = async (encryptedContent: string, iv: string, salt:
         iv: new Uint8Array(ivBuffer),
       },
       key,
-      encryptedData,
+      encryptedData
     )
-
+    
     // Decode and return the decrypted message
     return new TextDecoder().decode(decryptedContent)
   } catch (error) {
