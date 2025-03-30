@@ -1,9 +1,11 @@
 "use client"
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { encryptMessage } from '@/lib/encryption'
+import { generateId } from '@/lib/utils'
 
 export default function Home() {
   const [message, setMessage] = useState('')
@@ -32,10 +34,10 @@ export default function Home() {
       
       // In a real app, we would save this to a database
       // For now, we'll just generate a fake link
-      const id = Math.random().toString(36).substring(2, 10)
+      const id = generateId()
       
       // Create a shareable link
-      const link = `${window.location.origin}?id=${id}`
+      const link = `${window.location.origin}/view?id=${id}`
       setEncryptedLink(link)
     } catch (error) {
       console.error('Error creating message:', error)
@@ -60,7 +62,14 @@ export default function Home() {
           {encryptedLink ? (
             <div className="bg-gray-900 p-4 rounded-md mb-4">
               <p className="text-sm text-gray-400 mb-2">Share this link:</p>
-              <p className="text-green-400 break-all mb-2">{encryptedLink}</p>
+              <a 
+                href={encryptedLink}
+                className="text-green-400 break-all mb-2 block hover:underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {encryptedLink}
+              </a>
               <p className="text-xs text-gray-500">Message is encrypted with your password and will self-destruct after viewing.</p>
             </div>
           ) : (
@@ -124,6 +133,12 @@ export default function Home() {
           )}
         </CardFooter>
       </Card>
+      
+      <div className="mt-8 max-w-md w-full">
+        <Link href="/view" className="text-green-400 hover:underline text-center block">
+          Have a secure message? Access it here
+        </Link>
+      </div>
     </div>
   )
 }
